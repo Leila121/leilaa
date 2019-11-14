@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <Windows.h>
+int main()
+{
+	int i, j;
+	int x =5;
+	int y = 10;
+	//x.y为小球实际坐标
+	int top =0;
+	int bottom =10;
+	int left =0;
+	int right =10;
+	int velocity_x = 1;//速度
+	int velocity_y = 1;
+
+	while (1)
+	{
+		x = x + velocity_x;
+		y = y + velocity_y;
+		system("cls");//清屏
+
+		for (i = 0; i < x; i++)
+			printf("\n");
+		//小球上面的空行
+		for (j = 0; j < y; j++)
+			printf("  ");
+		//小球左边的空格
+		printf("0");
+		printf("\n");
+		Sleep(50);//等待50毫秒。
+
+	/*	if (x == top )
+			velocity_x = -velocity_x;
+		if (x== bottom)
+			velocity_x = -velocity_x;
+		if ( y ==right )
+			velocity_y = -velocity_y;
+		if (y == left )
+			velocity_y = -velocity_y;
+	*/
+		if ((x == top) || (x == bottom))
+		{
+			velocity_x = -velocity_x;
+			printf("\a");
+		}
+		if ((y == right) || (y == left))
+		{
+			velocity_y = -velocity_y;
+			printf("\a");
+		}
+	}
+
+	return 0;
+}
