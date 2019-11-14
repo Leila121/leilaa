@@ -1,0 +1,151 @@
+#include <stdio.h>
+#include<stdlib.h>
+#include<conio.h>
+#include<Windows.h>
+
+int high, width;//游戏画面尺寸
+int ball_x, ball_y;//小球坐标
+int ball_vx, ball_vy;//小球速度
+int position_x, position_y;//挡板中心坐标
+int ridus;//挡板半径
+int left, right;//挡板左右边界
+int ball_number;//反弹次数、
+int score;//消除得分
+int block_x, block_y;//砖块坐标
+
+void gotoxy(int x, int y) //光标移动到(x,y)位置
+{
+
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD pos;
+	pos.X = x;
+	pos.Y = y;
+	SetConsoleCursorPosition(handle, pos);
+}
+
+void HideCursor() // 用于隐藏光标
+{
+	CONSOLE_CURSOR_INFO cursor_info = { 1, 0 };  // 第二个值为0表示隐藏光标
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor_info);
+}
+
+void startup() //初始化
+{
+	high = 15;
+	width = 20;
+
+	ball_x = 0;
+	ball_y = width / 2;
+	ball_vx = 1;
+	ball_vy = 1;
+
+	position_x = high;
+	position_y = width / 2;
+	ridus = 3;
+	left = position_y - ridus;
+	right = position_y + ridus;
+
+	ball_number = 0;
+
+	block_x = 0;
+	block_y = width / 2;
+
+	score = 0;
+}
+void show()//画面显示
+{
+	gotoxy(0, 0);
+	int i, j;
+	for (i = 0; i <= high+1; i++)
+	{
+		for (j = 0; j <= width; j++)
+		{
+			if ((i == ball_x) && (j == ball_y))
+				printf("o");  //输出小球
+			else if (j == width)
+				printf("|");// 输出右边界
+			else if (i==high+1)
+				printf("-");// 输出下边界
+			else if ((i==high)&&(j<=right)&&(j>=left))
+				printf("*");// 输出挡板
+			else if ((i==block_x)&&(j==block_y))
+				printf("B");//显示砖块
+			else
+				printf(" ");  //输出空格
+		}
+		printf("\n");
+	}
+	printf("反弹次数：%d\n", ball_number);//显示反弹次数
+	printf("得分：%d", score);
+}
+
+void updateWithoutInput() //与用户输入无关的更新
+{
+	if ((ball_x == block_x) && (ball_y == block_y))
+	{
+		score++;//得分
+		block_y = width / 2;//产生新的砖块
+	}
+
+	if (ball_x == high-1)
+	{
+		if ((ball_y >= left) && (ball_y <= right))
+		{
+			ball_number++;
+			printf("\a");  //响铃
+		}
+		else
+		{
+			printf("game over\n");
+			system("pause");//暂停,显示一个中文信息：“请按任意键继续. . .”
+			exit(0);//游戏结束
+		}
+			
+	}
+	
+
+	ball_x = ball_x + ball_vx;
+	ball_y = ball_y + ball_vy;//小球位置更新
+
+	if ((ball_x == 0) || (ball_x == high - 1)) //落地或碰墙
+		ball_vx = -ball_vx;
+	if ((ball_y == 0) || (ball_y == width - 1))  //碰壁
+		ball_vy = -ball_vy;
+
+	Sleep(80);//速度变慢
+}
+
+void updateWithInput()  //与用户输入有关的更新
+{
+	char input;
+	if (kbhit())
+	{
+		input = getch();
+		if (input == 'a')  //挡板左移
+		{
+			position_y--;
+			left = position_y - ridus;
+			right = position_y + ridus;
+		}
+		if (input == 'd')  //挡板右移
+		{
+			position_y++;
+			left = position_y - ridus;
+			right = position_y + ridus;
+		}
+
+	}
+		
+}
+
+int main()
+{
+	startup();  //初始化
+	while (1)
+	{
+		show();  //画面显示
+		updateWithoutInput();  //与用户输入无关的更新
+		updateWithInput();  //与用户输入有关的更新
+	}
+	return 0;
+}
